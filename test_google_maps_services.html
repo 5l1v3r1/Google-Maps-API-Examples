@@ -62,6 +62,7 @@
     <script>
       var map = null;
       var myRoute = null;
+      var current_step = 0;
 
       function initMap() {
         var markerArray = [];
@@ -123,16 +124,6 @@
         });
       }
 
-      const asleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-      }
-
-      function sleep(ms) {
-        var start = new Date().getTime(), expire = start + ms;
-        while (new Date().getTime() < expire) { }
-        return;
-      }
-
       function showSteps(directionResult, markerArray, stepDisplay, map) {
         // For each step, place a marker, and add the text to the marker's infowindow.
         // Also attach the marker to an array so we can keep track of it and remove it
@@ -163,16 +154,21 @@
         marker = new google.maps.Marker();
         marker.setMap(map);
         marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png');
-        setTimeout(function(){moveSupply(marker, myRoute.steps[1].path, 0);});
+        setTimeout(function(){move(marker, myRoute.steps, 0, current_step);});
       }
-
-      function move(marker, points, i) {
-        marker.setPosition(points[i]);
-        i++;
-        if (i >= points.length) {
-          return;
+      
+      // Move marker. tracker.
+      function move(marker, steps, i, current_step) {
+        if (i >= steps[current_step].path.length) {
+          i = 0;
+          current_step++;
+          if (current_step >= steps.length) {
+            return;
+          }
         }
-        setTimeout(function(){move(marker, points, i);}, 50);
+        marker.setPosition(steps[current_step].path[i]);
+        i++;
+        setTimeout(function(){move(marker, steps, i, current_step);}, 100);
       }
 
     </script>
